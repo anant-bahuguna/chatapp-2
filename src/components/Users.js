@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import fire from "../scripts/fire";
 import NewUser from './NewUser'
 import { observer } from "mobx-react";
+import {Link} from 'react-router-dom'
 
 @observer
 class Users extends Component {
@@ -15,7 +16,8 @@ class Users extends Component {
     this._getUser();
   }
   _getUser() {
-    const loginEmail = this.props.store.LoginInfo.user.email;
+    const {store} = this.props
+    const loginEmail = store.LoginInfo.user.email;
     const db = fire.firestore();
     db.collection("Users")
       .where("email", "==", loginEmail)
@@ -31,6 +33,7 @@ class Users extends Component {
             groupList: grps,
             userData: doc.data()
           });
+          store.setName(doc.data().userName)
         });
       })
       .catch(()=>{
@@ -54,19 +57,23 @@ class Users extends Component {
     const {store} = this.props
     return (
       <div>
-        <div className='collection'>
-          {this.state.groupList.map(group => {
-            return (
-              <a href='#!' className='collection-item' key={group}>
-                <span className='new badge'>4</span>
-                {group}
-              </a>
-            );
-          })}
+        <div >
+          
           {
             this.state.newUser?
             <NewUser store={store}/>
-            :<div></div>
+            :
+            <div className='collection'>
+
+            {this.state.groupList.map(group => {
+              return (
+                <Link to={{pathname: '/chat',store: {store}}} className='collection-item' key={group} onClick={()=>{store.setGroup(group)}}>
+                  <span className='new badge'>4</span>
+                  {group}
+                </Link>
+              );
+             })}
+            </div>
           }
         </div>
       </div>

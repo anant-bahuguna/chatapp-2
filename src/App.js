@@ -11,7 +11,7 @@ class App extends Component {
     const { store } = this.props;
     return (
       <div>
-          <Header myText={store.currentPage}/>
+          <Header store={store} myText={store.currentPage}/>
           <Login store={store} />
       
       </div>

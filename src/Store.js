@@ -5,9 +5,22 @@ class Store {
 
   @observable currentPage = ''
 
+  @observable currentGroup = ''
+
+  @observable chatName = ''
+
+  @action setName(Name) {
+    this.chatName = Name
+  }
+
   @action changePage(pageName) {
     this.currentPage = pageName
   }
+
+  @action setGroup(groupId) {
+    this.currentGroup = groupId
+  }
+
 
   @action userLogin(isLoggedIn, user) {
     this.LoginInfo ={
