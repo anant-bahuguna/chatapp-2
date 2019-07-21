@@ -3,11 +3,19 @@ import { observable, action, computed } from "mobx";
 class Store {
   @observable LoginInfo = { isLoggedIn: false, user: null};
 
+  @observable checkNewUser = false
   @observable currentPage = ''
 
-  @observable currentGroup = ''
+  @observable currentGroup = {
+    gId: '',
+    gName: ''
+  }
 
   @observable chatName = ''
+
+  @action setNewUser(newUser) {
+    this.checkNewUser = newUser
+  }
 
   @action setName(Name) {
     this.chatName = Name
@@ -17,8 +25,11 @@ class Store {
     this.currentPage = pageName
   }
 
-  @action setGroup(groupId) {
-    this.currentGroup = groupId
+  @action setGroup(gId,gName) {
+    this.currentGroup = {
+      gId,
+      gName
+    }
   }
 
 

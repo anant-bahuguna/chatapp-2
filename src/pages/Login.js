@@ -3,6 +3,8 @@ import LoginButton from "../components/LoginButton";
 import { observer } from "mobx-react";
 import fire from "../scripts/fire";
 import Users from '../components/Users'
+import Header from "../components/Header";
+import {Link} from 'react-router-dom'
 
 
 
@@ -23,7 +25,7 @@ class Login extends Component {
 
 
   componentDidMount() {
-    this.props.store.changePage('Login Page')
+    this.props.store.changePage('Home')
   }
   
 
@@ -31,15 +33,21 @@ class Login extends Component {
       const {store} = this.props
     return (
       <div>
-        
+        <Header store={store} />
+        <br />
         <div className='container'>
-          <LoginButton showProfile={true} store={store} />
+          
           {
             store.LoginInfo.isLoggedIn?
             <div>
+              
               <Users store={store}/>
             </div>
-            :<div></div>
+            :<div>
+              
+              <LoginButton showProfile={false} store={store} />
+
+            </div>
           }
          
         </div>

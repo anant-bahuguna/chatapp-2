@@ -4,7 +4,8 @@ module.exports = {
   entry: "./src/index.js",
   output: {
     filename: "main.js",
-    path: path.join(__dirname, "build")
+    path: path.join(__dirname, "build"),
+    publicPath: '/'
   },
   module: {
     rules: [
@@ -16,6 +17,19 @@ module.exports = {
       {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: "file-loader"
+      },
+      {
+        test: /\.css$/i,
+        loader: ["style-loader", "css-loader"]
+      },
+      {
+        test: /\.(jpe?g|gif|png|svg)$/i,
+        loader: {
+          loader: "url-loader",
+          options: {
+            limit: 10000
+          }
+        }
       }
     ]
   }

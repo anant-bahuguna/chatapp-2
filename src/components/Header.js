@@ -1,26 +1,38 @@
 import React, { Component } from 'react'
 import {Link} from 'react-router-dom'
-import Modal from './Modal'
+
+import Sidenav from './Sidenav'
+import { observer } from 'mobx-react';
+import LoginCard from './LoginCard';
 
 
 
-
+@observer
 class Header extends Component {
     render() {
-        const {store} = this.props.store
+        const {store} = this.props
         return (
-            <nav>
-                <div className="nav-wrapper indigo darken-1">
-                <a href="#" className="brand-logo">{this.props.myText}</a>
-                <ul id="nav-mobile" className="right hide-on-med-and-down">
-                    <li><Link to={{pathname: '/profile',store: {store}}}>Profile</Link></li>
+            <div className='navbar-fixed'>
+               
                    
-                    <li><Link to={{pathname: '/',store: {store}}}>Home</Link></li>
-                    
-                    <li><Modal store={store}/></li>
-                </ul>
-                </div>
-             </nav>
+                   <nav>
+                   <Sidenav store={store}/>
+                   <div className="nav-wrapper white">
+                   <a href="#" className="brand-logo center black-text">{store.currentPage}</a>
+                   <ul id="nav-mobile" className="right hide-on-med-and-down">
+                       <li><Link className='black-text' to={{pathname: '/profile',store: {store}}}>Profile</Link></li>
+                      
+                       <li><Link className='black-text' to={{pathname: '/',store: {store}}}>Home</Link></li>
+                       <li><Link className='black-text' to={{pathname: '/group',store: {store}}}>New Group</Link></li>
+                       
+                   </ul>
+                   </div>
+                </nav>
+                
+               
+            </div>
+            
+             
         )
     }
 }

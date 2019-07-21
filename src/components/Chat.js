@@ -1,52 +1,54 @@
 import React, { Component } from "react";
 import fire from "../scripts/fire.js";
 import Header from "./Header";
-
-import firebase from 'firebase';
+import "../css/Chat.css";
+import firebase from "firebase";
 import { observer } from "mobx-react";
-
+import LoginButton from "./LoginButton.js";
+import Image from "../images/chatBg3.png";
 
 @observer
 class Chat extends Component {
   state = {
     msg: [
       {
-        author: "",
-        body: ""
+        author: "admin",
+        body: "Welcome.."
       }
     ],
-    inputChat: ""
+    inputChat: "",
+    docId: "",
+    grpId: ""
   };
 
-  _getGroupName() {
-    const { store } = this.props.location.store;
-    let gName
-    const db = fire.firestore();
-    const groupId = store.currentGroup;
-    db.collection("Groups")
-    .where('gId','==',groupId)
-    .get()
-    .then(querySnapshot=>{
-      querySnapshot.forEach(function(doc){
-        console.log(doc.data());
-        gName = doc.data().groupName
-        store.changePage(gName)
-        console.log(gName)
-      })
-    })
-    
-  }
+  // _getGroupName() {
+  //   const { store } = this.props
+  //   let gName
+  //   const db = fire.firestore();
+  //   const grpName = store.currentGroup;
+  //   db.collection("Groups")
+  //   .where('groupName','==',grpName)
+  //   .get()
+  //   .then(querySnapshot=>{
+  //     querySnapshot.forEach(function(doc){
+  //       console.log(doc.data());
+  //       gName = doc.data().groupName
+  //       store.changePage(gName)
+  //       console.log('groupName',gName)
+  //     })
+  //   })
+
+  // }
+  // _scrollToBottom(box) {
+  //   box.scrollTop = box.scrollHeight
+  // }
   componentDidMount() {
-
-
-    const { store } = this.props.location.store;
-    this._getGroupName()
-    
-    
+    const { store } = this.props;
+    store.changePage(store.currentGroup.gName);
+    console.log('hello-reload')
     const db = fire.firestore();
-    const groupId = store.currentGroup;
-    
-    
+    const groupId = this.props.match.params.gId
+
     console.log(groupId);
     db.collection("Groups")
       .where("gId", "==", groupId)
@@ -54,121 +56,153 @@ class Chat extends Component {
         querySnapshot.forEach(doc => {
           console.log(doc.data().messages);
           const dbMessages = doc.data().messages;
+
+          let dId = doc.id;
+          console.log("did", dId);
           let message = [
             {
               author: "",
               body: ""
             }
-          ]
-          dbMessages.map(dbMsg => {
-            
-            message.push(dbMsg);
-            
-          });
+          ];
+          if (typeof dbMessages !== "undefined") {
+            dbMessages.map(dbMsg => {
+              message.push(dbMsg);
+            });
+          }
           this.setState({
-            msg: message
+            msg: message,
+            docId: dId
           });
+          console.log("docId", this.state.docId);
         });
       });
+      // var box = document.getElementById('box')
+      // this._scrollToBottom(box)
   }
 
   _send() {
-    const { store } = this.props.location.store;
-    const groupId = store.currentGroup;
+    console.log("hello", this.state.docId);
+    const { store } = this.props;
+    console.log(store.chatName);
     const db = fire.firestore();
     const groupData = {
       body: this.state.inputChat,
       author: store.chatName
     };
     const msgData = {
-      gId: groupId,
+      gId: store.currentGroup.gId,
       message: {
         body: this.state.inputChat,
-      author: store.chatName
+        author: store.chatName
       }
-      
     };
+    // check docId
 
+    var citiesRef = db.collection("Groups").doc(this.state.docId);
 
-    // Create a reference to the Groups collection
-var citiesRef = db.collection("Groups").doc('sAlqp3s6x8ubw1kXjEmJ');
-
-// Create a query against the collection.
-// var query = citiesRef.where("gId", "==", groupId);
-
-    citiesRef
-      .update({
-        messages: firebase.firestore.FieldValue.arrayUnion(groupData)
-
-      })
-     
-    db.collection('Messages')
-    .add(msgData)
-    .then(function(docRef) {
-      console.log("Document written with ID: ", docRef.id);
-    })
-    .catch(function(error) {
-      console.error("Error adding document: ", error);
+    citiesRef.update({
+      messages: firebase.firestore.FieldValue.arrayUnion(groupData)
     });
+
+    db.collection("Messages")
+      .add(msgData)
+      .then(function(docRef) {
+        console.log("Document written with ID: ", docRef.id);
+      })
+      .then(() => {
+        document.getElementById("inputBox").value = "";
+      })
+      .catch(function(error) {
+        console.error("Error adding document: ", error);
+      });
   }
 
   render() {
-    const { store } = this.props.location.store;
-    
+    const { store } = this.props;
+
     return (
       <div>
-        <Header store={store} myText={store.currentPage}/>
-        <div className='container'>
-          <br />
-          <br />
-          <div>
-            {this.state.msg.length !== 1 ? (
-              this.state.msg.map((message, i) => {
-                return i != 0 ? (
-                  <div className='row ' key={i}>
-                    <div className='col s12 m6 l4'>
-                      <div className='card blue-grey darken-1'>
-                        <div className='card-content white-text'>
-                          <p className='flow-text'>{message.body}</p>
+        <Header store={store} myText={store.currentPage} />
+        {store.LoginInfo.isLoggedIn ? (
+          <div
+            className='container'
+            
+          >
+            <div
+            style={{ backgroundImage: `url(${Image})` }}
+          >
+            <br />
+            <br />
+            <div>
+              {this.state.msg.length !== 1 ? (
+                this.state.msg.map((message, i) => {
+                  return i != 0 ? (
+                    <div className='row ' key={i}>
+                      {message.author === store.chatName ? (
+                        <div className='col s6 m6 l4 push-m6 push-s5 push-l8'>
+                          <div className='card blue'>
+                            <div className='card-content white-text'>
+                              <p>{message.body}</p>
+                            </div>
+                          </div>
                         </div>
-                        <div className='card-action blue-grey lighten-4'>
-                          <strong>{message.author}</strong>
+                      ) : (
+                        <div className='col s6 m6 l4'>
+                          <div className='card white'>
+                            <div className='card-content'>
+                              <p>{message.body}</p>
+                            </div>
+                            <div className='card-action transparent'>
+                              <strong>{message.author}</strong>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                ) : (
-                  <br key={i} />
-                );
-              })
-            ) : (
-              <br />
-            )}
+                  ) : (
+                    <br key={i} />
+                  );
+                })
+              ) : (
+                <br />
+              )}
+            </div>
+            <br />
+            <br />
+            
+            <div className='row'>
+              <span className='input-field col m6 s8 push-m1 push-l1'>
+                <textarea
+                  placeholder='Type message here...'
+                  className='materialize-textarea'
+                  id='inputBox'
+                  onChange={e =>
+                    this.setState({
+                      inputChat: e.target.value
+                    })
+                  }
+                />
+              </span>
+              <span className='col s1 push-m1 push-s1 push-l1'>
+                <br />
+                <button
+                  onClick={() => this._send()}
+                  className=' btn waves-effect waves-light pink accent-2'
+                >
+                  SEND
+                </button>
+              </span>
+            </div>
+            
+            </div>
           </div>
-          <br />
-          <br />
-          <div className='row'>
-            <span className='input-field col m8'>
-              <textarea
-                className='materialize-textarea'
-                id='inputBox'
-                onChange={e =>
-                  this.setState({
-                    inputChat: e.target.value
-                  })
-                }
-              />
-            </span>
-            <span className='col offset-m1'>
-              <button
-                onClick={() => this._send()}
-                className='btn-floating btn-medium waves-effect waves-light red'
-              >
-                <i className='material-icons'>send</i>
-              </button>
-            </span>
+        ) : (
+          <div className='container'>
+            <br />
+            <LoginButton showProfile={false} store={store} />
           </div>
-        </div>
+        )}
       </div>
     );
   }

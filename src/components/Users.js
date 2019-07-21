@@ -27,31 +27,30 @@ class Users extends Component {
           // console.log(doc.id, " => ", doc.data());
           const grps = this.state.groupList;
           doc.data().groups.forEach(group => {
-            grps.push(group.gId);
+            grps.push({
+              gId: group.gId,
+              gName:group.gName});
           });
           this.setState({
             groupList: grps,
-            userData: doc.data()
+            userData: doc.data(),
           });
           store.setName(doc.data().userName)
         });
       })
-      .catch(()=>{
-        console.log("no user found,  Adding user");
-        this.setState({
-          newUser: true
-        })
-      });
-      if(this.state.userData === {})
+      .then(()=>{
+        if(this.state.groupList.length === 0)
       {
-        console.log('new user');
+        console.log('new user',this.state.groupList);
         this.setState({
           newUser: true
         })
       }
       else {
-        console.log('old user');
+        console.log('old user',this.state.groupList);
       }
+      })
+      
   }
   render() {
     const {store} = this.props
@@ -67,9 +66,9 @@ class Users extends Component {
 
             {this.state.groupList.map(group => {
               return (
-                <Link to={{pathname: '/chat',store: {store}}} className='collection-item' key={group} onClick={()=>{store.setGroup(group)}}>
+                <Link to={`/chat/${group.gId}`} className='collection-item' key={group.gId} onClick={()=>{store.setGroup(group.gId,group.gName)}}>
                   <span className='new badge'>4</span>
-                  {group}
+                  {group.gName}
                 </Link>
               );
              })}

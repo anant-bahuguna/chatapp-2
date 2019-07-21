@@ -11,6 +11,8 @@ class LoginButton extends Component {
             if (user) {
               // User is signed in.
               this.props.store.userLogin(true,user)
+              this._getChatName()
+              
             } else {
               // No user is signed in.
               this.props.store.userLogin(false,null) 
@@ -18,6 +20,19 @@ class LoginButton extends Component {
             }
           });
           
+    }
+    _getChatName() {
+      const {store} = this.props
+              const loginEmail = store.LoginInfo.user.email;
+              const db = fire.firestore();
+              db.collection("Users")
+                .where("email", "==", loginEmail)
+                .get()
+                .then(querySnapshot => {
+                  querySnapshot.forEach(doc => {
+                    store.setName(doc.data().userName)
+                  });
+                })
     }
     _signIn() {
         var provider = new firebase.auth.GoogleAuthProvider();
@@ -73,10 +88,10 @@ class LoginButton extends Component {
                     store.LoginInfo.user && showProfile?
                     <div className='flow-text'>
                         <img src={store.LoginInfo.user.photoURL}width={80} height={80} style={{borderRadius:'50%'}}></img>
-                        <h4 style={{fontSize:'2rem'}}>{store.LoginInfo.user.displayName}</h4>
+                        <h5 style={{fontSize:'1.5rem'}}>{store.LoginInfo.user.displayName}</h5>
                         
                     </div>:
-                    <div>..</div>
+                    <div></div>
                 }
                 
                 

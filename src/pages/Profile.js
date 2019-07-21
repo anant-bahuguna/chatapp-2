@@ -10,13 +10,17 @@ class Profile extends Component {
         const {store} = this.props
         store.changePage('Profile')
         console.log(store.currentPage);
+        
     }
     render() {
         const {store} = this.props
         return (
-            <div>
+            <div >
                 <Header myText={store.currentPage} store={store} />
+                <div className = 'container'>
                 <LoginButton store={store} showProfile = {true} />
+                </div>
+                
             </div>
         )
     }
