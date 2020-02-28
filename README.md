@@ -1,5 +1,5 @@
-# Chat App v2.0.0
+# Chat App v2.0.0 -> ChatMan
 
 Using ReactJS,MobX,Webpack,Firestore
 
-Demo -  [Chat App](https://chat-app-e2738.firebaseapp.com/)
+LIVE -  [ChatMan](https://chat-app-e2738.firebaseapp.com/)
